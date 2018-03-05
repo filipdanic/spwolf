@@ -268,7 +268,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
   SpWolfForm.propTypes = {
     onCanSubmitFormChange: PropTypes.func,
     debugOnChange: PropTypes.func,
-    specs: PropTypes.arrayOf(PropTypes.shape({
+    specs: PropTypes.shape({
       sections: PropTypes.arrayOf({
         meta: PropTypes.object,
         elements: PropTypes.arrayOf(PropTypes.shape({
@@ -293,7 +293,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
         fn: PropTypes.func.isRequired,
         dependsOn: PropTypes.arrayOf(PropTypes.string),
       }))
-    })).isRequired
+    }).isRequired
   };
 
   SpWolfForm.defaultProps = {
