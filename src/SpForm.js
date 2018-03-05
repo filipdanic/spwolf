@@ -26,14 +26,14 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       const { specs } = this.props;
       const { defineStateGetter } = this.context;
       defineStateGetter && defineStateGetter(this.getFormState);
-      const { conditionalFields } = specs;
+      const { conditionalFields = [] } = specs;
       this.conditionalFields = conditionalFields;
       const elements = flattenSections(specs.sections);
       this.validationFeedbackRules = flattenValidationRules(elements);
       this.visibilityMap = formVisibilityDepMap(elements);
       this.elementsWithOnChangeReset = formOnChangeDepList(elements);
       this.calculateAllConditionalFields();
-    };
+    }
 
     getFormState = () => ({
       initialState: this.state.initialState,
@@ -324,7 +324,7 @@ export const connect = (Component) => {
 
     render() {
       return (
-        <Component getFormState={this.state.getFormState} />
+        <Component getFormState={this.state.getFormState} {...(this.props || {})} />
       );
     }
   }
