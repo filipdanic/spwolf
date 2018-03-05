@@ -267,9 +267,9 @@ export const FormHoC = ({ componentMap, wrappers }) => {
 
   SpWolfForm.propTypes = {
     onCanSubmitFormChange: PropTypes.func,
-    debugOnChange: PropTypes.func,
+    debugOnChange: PropTypes.bool,
     specs: PropTypes.shape({
-      sections: PropTypes.arrayOf({
+      sections: PropTypes.arrayOf(PropTypes.shape({
         meta: PropTypes.object,
         elements: PropTypes.arrayOf(PropTypes.shape({
           name: PropTypes.string.isRequired,
@@ -287,11 +287,11 @@ export const FormHoC = ({ componentMap, wrappers }) => {
             checkOnChange: PropTypes.bool
           }))
         })).isRequired
-      }).isRequired,
+      })).isRequired,
       conditionalFields: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         fn: PropTypes.func.isRequired,
-        dependsOn: PropTypes.arrayOf(PropTypes.string),
+        dependsOn: PropTypes.arrayOf(PropTypes.string)
       }))
     }).isRequired
   };
