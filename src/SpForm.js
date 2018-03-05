@@ -22,7 +22,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       this.handleChange_ = props.debugOnChange ? this.handleChangeWithDebug : this.handleChange;
     }
 
-    componentDidMount = () => {
+    componentDidMount() {
       const { specs } = this.props;
       const { defineStateGetter } = this.context;
       defineStateGetter && defineStateGetter(this.getFormState);
