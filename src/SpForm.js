@@ -103,7 +103,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
         validationFeedback[field] = {
           hasFeedback: feedback !== undefined,
           type: (feedback || {}).type,
-          label: (feedback || {}).label,
+          label: (feedback || {}).label
         };
         this.setState({ validationFeedback });
       }
@@ -115,7 +115,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
 
     evaluateAsyncDep = (fn, dependants) => {
       const state = dependants.reduce((acc, _) =>
-        Object.assign({}, acc, {[_]: this.state.entityState[_] }), {});
+        Object.assign({}, acc, { [_]: this.state.entityState[_] }), {});
       const hash = getHash(state);
       if (this.state.cachedAsyncFields[hash]) {
         return this.state.cachedAsyncFields[hash];
@@ -264,6 +264,42 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       );
     }
   }
+
+  SpWolfForm.propTypes = {
+    onCanSubmitFormChange: PropTypes.func,
+    debugOnChange: PropTypes.func,
+    specs: PropTypes.arrayOf(PropTypes.shape({
+      sections: PropTypes.arrayOf({
+        meta: PropTypes.object,
+        elements: PropTypes.arrayOf(PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          fieldType: PropTypes.string.isRequired,
+          required: PropTypes.bool,
+          isPresentationalElement: PropTypes.bool,
+          dependsOn: PropTypes.arrayOf(PropTypes.string),
+          existsIf: PropTypes.arrayOf(PropTypes.string),
+          disabledIf: PropTypes.string,
+          onChangeReset: PropTypes.string,
+          validationFeedbackRules: PropTypes.arrayOf(PropTypes.shape({
+            type: PropTypes.string.isRequired,
+            condition: PropTypes.func.isRequired,
+            label: PropTypes.string,
+            checkOnChange: PropTypes.bool
+          }))
+        })).isRequired
+      }).isRequired,
+      conditionalFields: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        fn: PropTypes.func.isRequired,
+        dependsOn: PropTypes.arrayOf(PropTypes.string),
+      }))
+    })).isRequired
+  };
+
+  SpWolfForm.defaultProps = {
+    onCanSubmitFormChange: undefined,
+    debugOnChange: false
+  };
 
   SpWolfForm.contextTypes = {
     defineStateGetter: PropTypes.func
