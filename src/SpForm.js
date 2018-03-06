@@ -84,9 +84,9 @@ export const FormHoC = ({ componentMap, wrappers }) => {
         if (i === elements.length - 1) {
           const { diff } = this.getFormState();
           if (Object.keys(diff).length > 0) {
-            this.updateCanSubmitForm(false);
-          } else {
             this.updateCanSubmitForm(true);
+          } else {
+            this.updateCanSubmitForm(false);
           }
         }
       }
