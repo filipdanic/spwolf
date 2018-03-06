@@ -17,6 +17,7 @@ export const getDiff = (initialState = {}, formState) => ({
 });
 
 export const getInitialState = (props = {}) => ({
+  initialState: props.initialState || {},
   entityState: props.initialState || {},
   cachedAsyncFields: {},
   validationFeedback: {},
