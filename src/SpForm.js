@@ -14,7 +14,8 @@ import {
 import {
   flattenValidationRules,
   getValidationFeedback,
-  getValidateFeedbackForField
+  getValidateFeedbackForField,
+  canSubmitForm
 } from './validation';
 
 const flattenSections = memoize(flattenSections_);
@@ -52,51 +53,14 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       this.props.onCanSubmitFormChange && this.props.onCanSubmitFormChange(canSubmitForm);
     };
 
-    validateForm = () => {
-      const { entityState } = this.state;
-      const { specs } = this.props;
-      const elements = flattenSections(specs.sections);
-
-      for (let i = 0; i < elements.length; i += 1) {
-        const element = elements[i];
-        const value = entityState[element.name];
-        let existsInFormContext = true;
-        if (element.existsIf) {
-          existsInFormContext = element.existsIf
-            .reduce((acc, cond) => acc && entityState[cond], true);
-        }
-
-        if (existsInFormContext) {
-          if (element.validationFeedbackRules) {
-            const feedback = this.validationFeedbackRules[element.name]
-              .find(rule =>
-                getValidationFeedback(
-                  element.name,
-                  entityState,
-                  rule.condition,
-                  rule.validateWith
-                ));
-            if (feedback && feedback.type === 'error') {
-              this.updateCanSubmitForm(false);
-              break;
-            }
-          } else if (element.required) {
-            if ((value === undefined || value === '')) {
-              this.updateCanSubmitForm(false);
-              break;
-            }
-          }
-        }
-        if (i === elements.length - 1) {
-          const { diff = {} } = this.getFormState();
-          if (Object.keys(diff.diff || {}).length > 0) {
-            this.updateCanSubmitForm(true);
-          } else {
-            this.updateCanSubmitForm(false);
-          }
-        }
-      }
-    };
+    validateForm = () =>
+      this.updateCanSubmitForm(canSubmitForm(
+        this.state.entityState,
+        this.getFormState,
+        this.props.specs,
+        flattenSections(this.props.specs.sections),
+        this.validationFeedbackRules
+      ));
 
     validateField = (field, checkOnlyIfCheckOnChangeSpecified) => {
       if (this.validationFeedbackRules[field]) {

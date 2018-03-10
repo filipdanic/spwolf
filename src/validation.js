@@ -44,3 +44,46 @@ export const getValidateFeedbackForField = (
     label: (feedback || {}).label
   };
 };
+
+export const canSubmitForm = (
+  entityState,
+  getFormStateFn,
+  specs,
+  elements,
+  validationFeedbackRules
+) => {
+  for (let i = 0; i < elements.length; i += 1) {
+    const element = elements[i];
+    const value = entityState[element.name];
+    let existsInFormContext = true;
+    if (element.existsIf) {
+      existsInFormContext = element.existsIf
+        .reduce((acc, cond) => acc && entityState[cond], true);
+    }
+
+    if (existsInFormContext) {
+      if (element.validationFeedbackRules) {
+        const feedback = validationFeedbackRules[element.name]
+          .find(rule =>
+            getValidationFeedback(
+              element.name,
+              entityState,
+              rule.condition,
+              rule.validateWith
+            ));
+        if (feedback && feedback.type === 'error') {
+          return false;
+        }
+      } else if (element.required) {
+        if ((value === undefined || value === '')) {
+          return false;
+        }
+      }
+    }
+    if (i === elements.length - 1) {
+      const { diff = {} } = getFormStateFn();
+      return Object.keys(diff.diff || {}).length > 0;
+    }
+  }
+  return true;
+};

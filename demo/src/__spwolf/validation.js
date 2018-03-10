@@ -1,8 +1,10 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -35,4 +37,52 @@ var getValidateFeedbackForField = exports.getValidateFeedbackForField = function
     type: (feedback || {}).type,
     label: (feedback || {}).label
   };
+};
+
+var canSubmitForm = exports.canSubmitForm = function canSubmitForm(entityState, getFormStateFn, specs, elements, validationFeedbackRules) {
+  var _loop = function _loop(i) {
+    var element = elements[i];
+    var value = entityState[element.name];
+    var existsInFormContext = true;
+    if (element.existsIf) {
+      existsInFormContext = element.existsIf.reduce(function (acc, cond) {
+        return acc && entityState[cond];
+      }, true);
+    }
+
+    if (existsInFormContext) {
+      if (element.validationFeedbackRules) {
+        var feedback = validationFeedbackRules[element.name].find(function (rule) {
+          return getValidationFeedback(element.name, entityState, rule.condition, rule.validateWith);
+        });
+        if (feedback && feedback.type === 'error') {
+          return {
+            v: false
+          };
+        }
+      } else if (element.required) {
+        if (value === undefined || value === '') {
+          return {
+            v: false
+          };
+        }
+      }
+    }
+    if (i === elements.length - 1) {
+      var _getFormStateFn = getFormStateFn(),
+          _getFormStateFn$diff = _getFormStateFn.diff,
+          diff = _getFormStateFn$diff === undefined ? {} : _getFormStateFn$diff;
+
+      return {
+        v: Object.keys(diff.diff || {}).length > 0
+      };
+    }
+  };
+
+  for (var i = 0; i < elements.length; i += 1) {
+    var _ret = _loop(i);
+
+    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+  }
+  return true;
 };

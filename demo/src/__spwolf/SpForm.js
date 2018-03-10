@@ -80,55 +80,7 @@ var FormHoC = function FormHoC(_ref) {
       };
 
       _this.validateForm = function () {
-        var entityState = _this.state.entityState;
-        var specs = _this.props.specs;
-
-        var elements = flattenSections(specs.sections);
-
-        var _loop = function _loop(i) {
-          var element = elements[i];
-          var value = entityState[element.name];
-          var existsInFormContext = true;
-          if (element.existsIf) {
-            existsInFormContext = element.existsIf.reduce(function (acc, cond) {
-              return acc && entityState[cond];
-            }, true);
-          }
-
-          if (existsInFormContext) {
-            if (element.validationFeedbackRules) {
-              var feedback = _this.validationFeedbackRules[element.name].find(function (rule) {
-                return (0, _validation.getValidationFeedback)(element.name, entityState, rule.condition, rule.validateWith);
-              });
-              if (feedback && feedback.type === 'error') {
-                _this.updateCanSubmitForm(false);
-                return 'break';
-              }
-            } else if (element.required) {
-              if (value === undefined || value === '') {
-                _this.updateCanSubmitForm(false);
-                return 'break';
-              }
-            }
-          }
-          if (i === elements.length - 1) {
-            var _this$getFormState = _this.getFormState(),
-                _this$getFormState$di = _this$getFormState.diff,
-                diff = _this$getFormState$di === undefined ? {} : _this$getFormState$di;
-
-            if (Object.keys(diff.diff || {}).length > 0) {
-              _this.updateCanSubmitForm(true);
-            } else {
-              _this.updateCanSubmitForm(false);
-            }
-          }
-        };
-
-        for (var i = 0; i < elements.length; i += 1) {
-          var _ret = _loop(i);
-
-          if (_ret === 'break') break;
-        }
+        return _this.updateCanSubmitForm((0, _validation.canSubmitForm)(_this.state.entityState, _this.getFormState, _this.props.specs, flattenSections(_this.props.specs.sections), _this.validationFeedbackRules));
       };
 
       _this.validateField = function (field, checkOnlyIfCheckOnChangeSpecified) {
@@ -191,14 +143,14 @@ var FormHoC = function FormHoC(_ref) {
           if (field.dependsOn.some(function (dependant) {
             return dependant === key;
           })) {
-            var _value = field.fn(_this.state.entityState);
+            var value = field.fn(_this.state.entityState);
             var inferredUpdates = {};
-            if (_value === false) {
+            if (value === false) {
               inferredUpdates = (_this.visibilityMap[field.name] || []).reduce(function (acc, _) {
                 return Object.assign({}, acc, _defineProperty({}, _, undefined));
               }, {});
             }
-            return Object.assign({}, state, inferredUpdates, _defineProperty({}, field.name, _value));
+            return Object.assign({}, state, inferredUpdates, _defineProperty({}, field.name, value));
           }
           return state;
         }, prev);
@@ -359,7 +311,7 @@ var connect = exports.connect = function connect(Component) {
     function Connected() {
       var _ref5;
 
-      var _temp, _this3, _ret2;
+      var _temp, _this3, _ret;
 
       _classCallCheck(this, Connected);
 
@@ -367,9 +319,9 @@ var connect = exports.connect = function connect(Component) {
         args[_key] = arguments[_key];
       }
 
-      return _ret2 = (_temp = (_this3 = _possibleConstructorReturn(this, (_ref5 = Connected.__proto__ || Object.getPrototypeOf(Connected)).call.apply(_ref5, [this].concat(args))), _this3), _this3.state = { getFormState: undefined }, _this3.defineStateGetter = function (cb) {
+      return _ret = (_temp = (_this3 = _possibleConstructorReturn(this, (_ref5 = Connected.__proto__ || Object.getPrototypeOf(Connected)).call.apply(_ref5, [this].concat(args))), _this3), _this3.state = { getFormState: undefined }, _this3.defineStateGetter = function (cb) {
         _this3.setState({ getFormState: cb });
-      }, _temp), _possibleConstructorReturn(_this3, _ret2);
+      }, _temp), _possibleConstructorReturn(_this3, _ret);
     }
 
     _createClass(Connected, [{
