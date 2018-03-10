@@ -1,16 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'fast-memoize';
+import debug from './debugHelpers';
+import getDiff from './diff';
+import { getHash } from './hash';
+import getInitialState from './initialState';
 import {
-  getHash,
-  getDiff,
-  getInitialState,
   flattenSections as flattenSections_,
+  formOnChangeDepList,
+  formVisibilityDepMap
+} from './reducers';
+import {
   flattenValidationRules,
-  formVisibilityDepMap,
-  getValidationFeedback,
-  formOnChangeDepList
-} from './utils';
+  getValidationFeedback
+} from './validation';
 
 const flattenSections = memoize(flattenSections_);
 
@@ -19,7 +22,9 @@ export const FormHoC = ({ componentMap, wrappers }) => {
     constructor(props) {
       super(props);
       this.state = getInitialState(props);
-      this.handleChange_ = props.debugOnChange ? this.handleChangeWithDebug : this.handleChange;
+      this.handleChange_ = props.debugOnChange ?
+        debug(this.handleChange).bind(this) :
+        this.handleChange;
     }
 
     componentDidMount() {
@@ -38,11 +43,10 @@ export const FormHoC = ({ componentMap, wrappers }) => {
     getFormState = () => ({
       initialState: this.state.initialState,
       state: this.state.entityState,
-      diff: getDiff(this.state.initialState, this.state.entityState),
+      diff: getDiff(this.state.initialState, this.state.entityState)
     });
 
     updateCanSubmitForm = (canSubmitForm) => {
-      this.setState({ canSubmitForm });
       this.props.onCanSubmitFormChange && this.props.onCanSubmitFormChange(canSubmitForm);
     };
 
@@ -144,29 +148,6 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       }, prev);
       this.setState({ entityState: next }, () => {
         this.validateForm();
-      });
-    };
-
-    handleChangeWithDebug = ({ key, value }) => {
-      const withReset = this.elementsWithOnChangeReset[key] ? {
-        [this.elementsWithOnChangeReset[key]]: undefined,
-      } : {};
-      console.group('spForm: handleChange');
-      console.log(`handleChange called for "${key}" with value: `, value);
-      const entityState = Object.assign(
-        {},
-        this.state.entityState,
-        withReset,
-        { [key]: value }
-      );
-      if (this.elementsWithOnChangeReset[key]) {
-        console.log(`%cThe key ${this.elementsWithOnChangeReset[key]} will be reset.`, 'color: red;');
-      }
-      console.log('Diff: ', getDiff(this.state.entityState, entityState));
-      console.groupEnd();
-      this.setState({ entityState }, () => {
-        this.dispatchChangedKey(key);
-        this.validateField(key, true);
       });
     };
 
@@ -275,6 +256,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
     debugOnChange: PropTypes.bool,
     specs: PropTypes.shape({
       sections: PropTypes.arrayOf(PropTypes.shape({
+        sectionProps: PropTypes.object,
         meta: PropTypes.object,
         elements: PropTypes.arrayOf(PropTypes.shape({
           name: PropTypes.string.isRequired,
@@ -329,7 +311,10 @@ export const connect = (Component) => {
 
     render() {
       return (
-        <Component getFormState={this.state.getFormState} {...(this.props || {})} />
+        <Component
+          getFormState={this.state.getFormState}
+          {...(this.props || {})}
+        />
       );
     }
   }
