@@ -1,0 +1,45 @@
+.App-title {
+  font-size: 1.5em;
+}
+
+.margin-bottom-12 {
+  margin-bottom: 12px;
+}
+
+.margin-top-12 {
+  margin-top: 12px;
+}
+
+.select-field-wrapper {
+  display: flex;
+  align-items: center;
+  align-content: center;
+}
+
+.feedback-warning {
+  color: orange;
+}
+
+.feedback-error {
+  color: indianred;
+}
+
+.select-field-wrapper--spinner {
+  margin-top: -12px;
+  margin-left: 12px;
+}
+
+.section-header {
+  margin-top: 24px;
+}
+
+.user-type-info {
+  font-size: 0.8em;
+  opacity: 0.5;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.user-type-info > svg {
+  stroke: dodgerblue !important;
+}

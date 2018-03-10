@@ -23,7 +23,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       super(props);
       this.state = getInitialState(props);
       this.handleChange_ = props.debugOnChange ?
-        debug(this.handleChange).bind(this) :
+        debug(this, this.handleChange) :
         this.handleChange;
     }
 
