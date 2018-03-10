@@ -13,7 +13,8 @@ import {
 } from './reducers';
 import {
   flattenValidationRules,
-  getValidationFeedback
+  getValidationFeedback,
+  getValidateFeedbackForField
 } from './validation';
 
 const flattenSections = memoize(flattenSections_);
@@ -97,24 +98,15 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       }
     };
 
-    validateField = (field, checkOnChangeOnly) => {
+    validateField = (field, checkOnlyIfCheckOnChangeSpecified) => {
       if (this.validationFeedbackRules[field]) {
         const { validationFeedback } = this.state;
-        const feedback = this.validationFeedbackRules[field]
-          .find(rule =>
-            (checkOnChangeOnly ? rule.checkOnChange : true) &&
-            getValidationFeedback(
-              field,
-              this.state.entityState,
-              rule.condition,
-              rule.validateWith
-            ));
-
-        validationFeedback[field] = {
-          hasFeedback: feedback !== undefined,
-          type: (feedback || {}).type,
-          label: (feedback || {}).label
-        };
+        validationFeedback[field] = getValidateFeedbackForField(
+          field,
+          this.validationFeedbackRules[field],
+          this.state.entityState,
+          checkOnlyIfCheckOnChangeSpecified
+        );
         this.setState({ validationFeedback });
       }
     };

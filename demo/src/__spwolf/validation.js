@@ -20,3 +20,19 @@ var getValidationFeedback = exports.getValidationFeedback = function getValidati
   }
   return conditionFn(entityState[fieldName]);
 };
+
+var getValidateFeedbackForField = exports.getValidateFeedbackForField = function getValidateFeedbackForField(field) {
+  var validationFeedbackRules = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  var entityState = arguments[2];
+  var checkOnlyIfCheckOnChangeSpecified = arguments[3];
+
+  var feedback = validationFeedbackRules.find(function (rule) {
+    return (checkOnlyIfCheckOnChangeSpecified ? rule.checkOnChange : true) && getValidationFeedback(field, entityState, rule.condition, rule.validateWith);
+  });
+
+  return {
+    hasFeedback: feedback !== undefined,
+    type: (feedback || {}).type,
+    label: (feedback || {}).label
+  };
+};

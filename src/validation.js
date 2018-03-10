@@ -21,3 +21,26 @@ export const getValidationFeedback = (
   }
   return conditionFn(entityState[fieldName]);
 };
+
+export const getValidateFeedbackForField = (
+  field,
+  validationFeedbackRules = [],
+  entityState,
+  checkOnlyIfCheckOnChangeSpecified
+) => {
+  const feedback = validationFeedbackRules
+    .find(rule =>
+      (checkOnlyIfCheckOnChangeSpecified ? rule.checkOnChange : true) &&
+      getValidationFeedback(
+        field,
+        entityState,
+        rule.condition,
+        rule.validateWith
+      ));
+
+  return {
+    hasFeedback: feedback !== undefined,
+    type: (feedback || {}).type,
+    label: (feedback || {}).label
+  };
+};

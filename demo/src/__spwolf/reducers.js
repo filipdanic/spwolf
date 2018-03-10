@@ -35,3 +35,9 @@ var formOnChangeDepList = exports.formOnChangeDepList = function formOnChangeDep
     return Object.assign({}, acc, _defineProperty({}, _.name, _.onChangeReset));
   }, {});
 };
+
+var getStateOfDependants = exports.getStateOfDependants = function getStateOfDependants(dependants, entityState) {
+  return dependants.reduce(function (acc, _) {
+    return Object.assign({}, acc, _defineProperty({}, _, entityState[_]));
+  }, {});
+};

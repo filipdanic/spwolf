@@ -131,19 +131,11 @@ var FormHoC = function FormHoC(_ref) {
         }
       };
 
-      _this.validateField = function (field, checkOnChangeOnly) {
+      _this.validateField = function (field, checkOnlyIfCheckOnChangeSpecified) {
         if (_this.validationFeedbackRules[field]) {
           var validationFeedback = _this.state.validationFeedback;
 
-          var feedback = _this.validationFeedbackRules[field].find(function (rule) {
-            return (checkOnChangeOnly ? rule.checkOnChange : true) && (0, _validation.getValidationFeedback)(field, _this.state.entityState, rule.condition, rule.validateWith);
-          });
-
-          validationFeedback[field] = {
-            hasFeedback: feedback !== undefined,
-            type: (feedback || {}).type,
-            label: (feedback || {}).label
-          };
+          validationFeedback[field] = (0, _validation.getValidateFeedbackForField)(field, _this.validationFeedbackRules[field], _this.state.entityState, checkOnlyIfCheckOnChangeSpecified);
           _this.setState({ validationFeedback: validationFeedback });
         }
       };
@@ -153,9 +145,7 @@ var FormHoC = function FormHoC(_ref) {
       };
 
       _this.evaluateAsyncDep = function (fn, dependants) {
-        var state = dependants.reduce(function (acc, _) {
-          return Object.assign({}, acc, _defineProperty({}, _, _this.state.entityState[_]));
-        }, {});
+        var state = (0, _reducers.getStateOfDependants)(dependants, _this.state.entityState);
         var hash = (0, _hash.getHash)(state);
         if (_this.state.cachedAsyncFields[hash]) {
           return _this.state.cachedAsyncFields[hash];
