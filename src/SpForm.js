@@ -8,7 +8,8 @@ import getInitialState from './initialState';
 import {
   flattenSections as flattenSections_,
   formOnChangeDepList,
-  formVisibilityDepMap
+  formVisibilityDepMap,
+  getStateOfDependants
 } from './reducers';
 import {
   flattenValidationRules,
@@ -123,8 +124,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
     };
 
     evaluateAsyncDep = (fn, dependants) => {
-      const state = dependants.reduce((acc, _) =>
-        Object.assign({}, acc, { [_]: this.state.entityState[_] }), {});
+      const state = getStateOfDependants(dependants, this.state.entityState);
       const hash = getHash(state);
       if (this.state.cachedAsyncFields[hash]) {
         return this.state.cachedAsyncFields[hash];

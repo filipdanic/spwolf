@@ -22,3 +22,7 @@ export const formOnChangeDepList = elements =>
     .filter(_ => !!_.onChangeReset)
     .reduce((acc, _) =>
       Object.assign({}, acc, { [_.name]: _.onChangeReset }), {});
+
+export const getStateOfDependants = (dependants, entityState) =>
+  dependants.reduce((acc, _) =>
+    Object.assign({}, acc, { [_]: entityState[_] }), {});
