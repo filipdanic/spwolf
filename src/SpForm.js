@@ -13,7 +13,6 @@ import {
 } from './reducers';
 import {
   flattenValidationRules,
-  getValidationFeedback,
   getValidateFeedbackForField,
   canSubmitForm
 } from './validation';
@@ -117,6 +116,18 @@ export const FormHoC = ({ componentMap, wrappers }) => {
         withReset,
         { [key]: value }
       );
+      /*
+       * Remove <key> if it was not in the initial state
+       * and now equals undefined. This will register as
+       * part of the diff { added: { [key]: undefined } },
+       * but it is not really something we want in our diff.
+       */
+      if (
+        !this.state.initialState.hasOwnProperty(key) &&
+        value === undefined
+      ) {
+        delete entityState[key];
+      }
       this.setState({ entityState }, () => {
         this.dispatchChangedKey(key);
         this.validateField(key, true);

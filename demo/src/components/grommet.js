@@ -27,6 +27,7 @@ export const TextInputField = ({ label, name, value, onChange, required, classNa
       className={className}
       disabled={disabled}
     />
+    <Button onClick={() => onChange({ key: name, value: undefined })}>Clear</Button>
     <ValidationFeedbackMessage feedback={validationFeedback} />
   </div>;
 

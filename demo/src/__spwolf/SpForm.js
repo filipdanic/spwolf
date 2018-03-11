@@ -130,6 +130,15 @@ var FormHoC = function FormHoC(_ref) {
 
         var withReset = _this.elementsWithOnChangeReset[key] ? _defineProperty({}, _this.elementsWithOnChangeReset[key], undefined) : {};
         var entityState = Object.assign({}, _this.state.entityState, withReset, _defineProperty({}, key, value));
+        /*
+         * Remove <key> if it was not in the initial state
+         * and now equals undefined. This will register as
+         * part of the diff { added: { [key]: undefined } },
+         * but it is not really something we want in our diff.
+         */
+        if (!_this.state.initialState.hasOwnProperty(key) && value === undefined) {
+          delete entityState[key];
+        }
         _this.setState({ entityState: entityState }, function () {
           _this.dispatchChangedKey(key);
           _this.validateField(key, true);
