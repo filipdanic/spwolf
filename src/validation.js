@@ -1,7 +1,25 @@
+/**
+ * Returns a map of validation rules indexed by
+ * every element’s name.
+ *
+ * @param {Array} elements
+ * @returns {Object}
+ */
 export const flattenValidationRules = elements =>
   elements.reduce((acc, element) =>
     Object.assign({}, acc, { [element.name]: element.validationFeedbackRules }), {});
 
+/**
+ * Returns true if there is validation feedback present
+ * for the given parameters by calling the supplied
+ * condition function.
+ *
+ * @param {string} fieldName
+ * @param {Object} entityState
+ * @param {Function} conditionFn
+ * @param {Array.<string>} validateWith
+ * @returns {boolean}
+ */
 export const getValidationFeedback = (
   fieldName,
   entityState,
@@ -22,6 +40,22 @@ export const getValidationFeedback = (
   return conditionFn(entityState[fieldName]);
 };
 
+/**
+ * Returns a feedback object for the provided field.
+ * By contract the only important `type` value if `error` which
+ * will in turn tell the form submission is not possible.
+ * User of this function need only look at the key hasFeedback to
+ * determine if any feedback is present for the provided parameters.
+ *
+ * Not all feedback is negative, users of the framework can also use
+ * feedback objects to provide additional information or success messages.
+ *
+ * @param {string} field
+ * @param {Array} validationFeedbackRules
+ * @param {Object} entityState
+ * @param {boolean} checkOnlyIfCheckOnChangeSpecified
+ * @returns {{hasFeedback: boolean, type: string, label: string}}
+ */
 export const getValidateFeedbackForField = (
   field,
   validationFeedbackRules = [],
@@ -45,10 +79,19 @@ export const getValidateFeedbackForField = (
   };
 };
 
+/**
+ * Returns true or false on whether the current
+ * state can be saved.
+ *
+ * @param {Object} entityState
+ * @param {Function} getFormStateFn
+ * @param {Array} elements
+ * @param {Object} validationFeedbackRules
+ * @returns {boolean}
+ */
 export const canSubmitForm = (
   entityState,
   getFormStateFn,
-  specs,
   elements,
   validationFeedbackRules
 ) => {
