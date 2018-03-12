@@ -49,7 +49,7 @@ export const formOnChangeDepMap = elements =>
  * entity state, returns a new object with the
  * key-value pair of all the dependants.
  *
- * @param {Array} dependants
+ * @param {Array.<string>} dependants
  * @param {Object} entityState
  * @returns {Object}
  */

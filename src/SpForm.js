@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import memoize from 'fast-memoize';
 import debug from './debugHelpers';
 import getDiff from './diff';
 import { getHash } from './hash';
 import getInitialState from './initialState';
 import {
-  flattenSections as flattenSections_,
+  flattenSections,
   formOnChangeDepMap,
   formVisibilityDepMap,
   getStateOfDependants
@@ -16,8 +15,6 @@ import {
   getValidateFeedbackForField,
   canSubmitForm
 } from './validation';
-
-const flattenSections = memoize(flattenSections_);
 
 export const FormHoC = ({ componentMap, wrappers }) => {
   class SpWolfForm extends React.Component {
@@ -29,25 +26,49 @@ export const FormHoC = ({ componentMap, wrappers }) => {
         this.handleChange;
     }
 
+    /**
+     * Initialize context
+     */
     componentDidMount() {
+      this.processContext();
       const { specs } = this.props;
-      const { defineStateGetter } = this.context;
-      defineStateGetter && defineStateGetter(this.getFormState);
       const { conditionalFields = [] } = specs;
-      this.conditionalFields = conditionalFields;
-      const elements = flattenSections(specs.sections);
-      this.validationFeedbackRules = flattenValidationRules(elements);
-      this.visibilityMap = formVisibilityDepMap(elements);
-      this.elementsWithOnChangeReset = formOnChangeDepMap(elements);
+      this.conditionalFields_ = conditionalFields;
+      this.elements_ = flattenSections(specs.sections);
+      this.validationFeedbackRules_ = flattenValidationRules(this.elements_);
+      this.visibilityMap_ = formVisibilityDepMap(this.elements_);
+      this.elementsWithOnChangeReset_ = formOnChangeDepMap(this.elements_);
       this.calculateAllConditionalFields();
     }
 
+    /**
+     *  exposes getFormState to the wrapping connect()
+     *  component via context
+     */
+    processContext = () => {
+      const { defineStateGetter } = this.context;
+      defineStateGetter && defineStateGetter(this.getFormState);
+    };
+
+    /**
+     *
+     * @returns {{
+     *   initialState: Object,
+     *   state: Object,
+     *   diff: {diff: Object, detailedDiff: {added: Object, updated: Object, deleted: Object}}
+     * }}
+     */
     getFormState = () => ({
       initialState: this.state.initialState,
       state: this.state.entityState,
       diff: getDiff(this.state.initialState, this.state.entityState)
     });
 
+    /**
+     * Passes the canSubmit boolean to the
+     * onCanSubmitFormChange prop.
+     * @param {boolean} canSubmit
+     */
     updateCanSubmitForm = (canSubmit) => {
       this.props.onCanSubmitFormChange && this.props.onCanSubmitFormChange(canSubmit);
     };
@@ -56,16 +77,16 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       this.updateCanSubmitForm(canSubmitForm(
         this.state.entityState,
         this.getFormState,
-        flattenSections(this.props.specs.sections),
-        this.validationFeedbackRules
+        this.elements_,
+        this.validationFeedbackRules_
       ));
 
     validateField = (field, checkOnlyIfCheckOnChangeSpecified) => {
-      if (this.validationFeedbackRules[field]) {
+      if (this.validationFeedbackRules_[field]) {
         const { validationFeedback } = this.state;
         validationFeedback[field] = getValidateFeedbackForField(
           field,
-          this.validationFeedbackRules[field],
+          this.validationFeedbackRules_[field],
           this.state.entityState,
           checkOnlyIfCheckOnChangeSpecified
         );
@@ -73,10 +94,27 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       }
     };
 
+    /**
+     * @param {string} field
+     */
     handleFieldBlur = (field) => {
       this.validateField(field);
     };
 
+    /**
+     * Creates a hash based on the values of the keys in the
+     * dependants array. Then looks if the value for that hash key
+     * is saved in state.cachedAsyncField. Returns it if true, otherwise
+     * calls the provided asyncDep function and once the result it generated,
+     * caches it and sets the state. (Triggering a re-render.)
+     *
+     * In the meantime, while the promise is left to execute, the function
+     * returns an object with the key `asyncPending` true which lets the
+     * input component know the value is currently loading.
+     * @param {function} fn
+     * @param {Array.<string>} dependants
+     * @returns {*}
+     */
     evaluateAsyncDep = (fn, dependants) => {
       const state = getStateOfDependants(dependants, this.state.entityState);
       const hash = getHash(state);
@@ -95,19 +133,42 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       return { asyncPending: true };
     };
 
+    /**
+     * Goes through all of the conditional fields and calculates
+     * their values. Finally sets the state.
+     * TODO: Need perhaps deep copy?
+     */
     calculateAllConditionalFields = () => {
       const prev = Object.assign({}, this.state.entityState);
-      const next = this.conditionalFields.reduce((state, field) => {
-        return Object.assign({}, state, { [field.name]: field.fn(this.state.entityState) });
-      }, prev);
+      const next = this.conditionalFields_.reduce((state, field) =>
+        Object.assign({}, state, {
+          [field.name]: field.fn(this.state.entityState)
+        }), prev);
       this.setState({ entityState: next }, () => {
         this.validateForm();
       });
     };
 
+    /**
+     * At minimum, sets the state with the provided key/value
+     * pair. It can also:
+     *  1. Reset the value of another field if such a
+     *  dependency is defined by the spec.
+     *  2. Remove a key from the state to avoid an
+     *  incorrect diff. (See comment above delete entityState[key].)
+     *
+     *  As a side effect it will also:
+     *  1. Trigger the validation for the field.
+     *  2. Call recalculateRelevantConditionalFields() to
+     *  allow conditional fields to recalculate.
+     *
+     * @param {string} key
+     * @param {*} value
+     */
     handleChange = ({ key, value }) => {
-      const withReset = this.elementsWithOnChangeReset[key] ? {
-        [this.elementsWithOnChangeReset[key]]: undefined,
+      // Used to reset a field if this behaviour is defined by the spec.
+      const withReset = this.elementsWithOnChangeReset_[key] ? {
+        [this.elementsWithOnChangeReset_[key]]: undefined,
       } : {};
       const entityState = Object.assign(
         {},
@@ -128,20 +189,34 @@ export const FormHoC = ({ componentMap, wrappers }) => {
         delete entityState[key];
       }
       this.setState({ entityState }, () => {
-        this.dispatchChangedKey(key);
+        this.recalculateRelevantConditionalFields(key);
         this.validateField(key, true);
       });
     };
 
-    dispatchChangedKey = (key) => {
+    /**
+     * Given the <key> that just changed, recalculate
+     * all relevant conditional fields.
+     *
+     * Side effects:
+     * 1. If there are fields that need to be toggled to invisible
+     * now that a conditional field has changed to `false`,
+     * then this method will reset them to `undefined`.
+     * 2. This will trigger validateForm. We use this.timer_ as
+     * a debounce mechanism to prevent form validation for 250ms
+     * in case another call is made to this function.
+     *
+     * @param {string} key
+     */
+    recalculateRelevantConditionalFields = (key) => {
       clearTimeout(this.timer_);
       const prev = Object.assign({}, this.state.entityState);
-      const next = this.conditionalFields.reduce((state, field) => {
+      const next = this.conditionalFields_.reduce((state, field) => {
         if (field.dependsOn.some(dependant => dependant === key)) {
           const value = field.fn(this.state.entityState);
           let inferredUpdates = {};
           if (value === false) {
-            inferredUpdates = (this.visibilityMap[field.name] || [])
+            inferredUpdates = (this.visibilityMap_[field.name] || [])
               .reduce((acc, _) =>
                 Object.assign({}, acc, { [_]: undefined }), {});
           }
@@ -261,6 +336,14 @@ export const FormHoC = ({ componentMap, wrappers }) => {
   return SpWolfForm;
 };
 
+/**
+ * Wrapping a component with connect will give you
+ * access to a prop called `getFormState`. See the method
+ * by the same name above for more info.
+ *
+ * @param {React.Component} Component
+ * @returns {React.Component}
+ */
 export const connect = (Component) => {
   class Connected extends React.Component {
     state = { getFormState: undefined };
