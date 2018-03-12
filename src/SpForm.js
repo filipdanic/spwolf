@@ -7,7 +7,7 @@ import { getHash } from './hash';
 import getInitialState from './initialState';
 import {
   flattenSections as flattenSections_,
-  formOnChangeDepList,
+  formOnChangeDepMap,
   formVisibilityDepMap,
   getStateOfDependants
 } from './reducers';
@@ -38,7 +38,7 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       const elements = flattenSections(specs.sections);
       this.validationFeedbackRules = flattenValidationRules(elements);
       this.visibilityMap = formVisibilityDepMap(elements);
-      this.elementsWithOnChangeReset = formOnChangeDepList(elements);
+      this.elementsWithOnChangeReset = formOnChangeDepMap(elements);
       this.calculateAllConditionalFields();
     }
 
@@ -48,15 +48,14 @@ export const FormHoC = ({ componentMap, wrappers }) => {
       diff: getDiff(this.state.initialState, this.state.entityState)
     });
 
-    updateCanSubmitForm = (canSubmitForm) => {
-      this.props.onCanSubmitFormChange && this.props.onCanSubmitFormChange(canSubmitForm);
+    updateCanSubmitForm = (canSubmit) => {
+      this.props.onCanSubmitFormChange && this.props.onCanSubmitFormChange(canSubmit);
     };
 
     validateForm = () =>
       this.updateCanSubmitForm(canSubmitForm(
         this.state.entityState,
         this.getFormState,
-        this.props.specs,
         flattenSections(this.props.specs.sections),
         this.validationFeedbackRules
       ));
@@ -221,9 +220,9 @@ export const FormHoC = ({ componentMap, wrappers }) => {
   SpWolfForm.propTypes = {
     onCanSubmitFormChange: PropTypes.func,
     debugOnChange: PropTypes.bool,
+    sectionProps: PropTypes.object,
     specs: PropTypes.shape({
       sections: PropTypes.arrayOf(PropTypes.shape({
-        sectionProps: PropTypes.object,
         meta: PropTypes.object,
         elements: PropTypes.arrayOf(PropTypes.shape({
           name: PropTypes.string.isRequired,
