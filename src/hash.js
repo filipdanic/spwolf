@@ -4,7 +4,7 @@
  * @param value
  * @return {string}
  */
-export const calculateHash = (value) => {
+export const calculateHashOfValue = (value) => {
   if (Array.isArray(value) || typeof value === 'object') {
     return JSON.stringify(value);
   }
@@ -24,4 +24,4 @@ export const calculateHash = (value) => {
  */
 export const getHash = state =>
   Object.keys(state).reduce((acc, key) =>
-    `${acc}${key}=${calculateHash(state[key])}||`, '');
+    `${acc}${key}=${calculateHashOfValue(state[key])}||`, '');

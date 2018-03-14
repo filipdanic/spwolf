@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import debug from './debugHelpers';
 import getDiff from './diff';
 import { getHash } from './hash';
-import getInitialState from './initialState';
+import getInitialState from './getInitialState';
 import {
   flattenSections,
   formOnChangeDepMap,
