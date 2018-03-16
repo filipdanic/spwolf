@@ -26,7 +26,7 @@ export const getValidationFeedback = (
   conditionFn,
   validateWith
 ) => {
-  if (validateWith) {
+  if (Array.isArray(validateWith) && validateWith.length > 0) {
     return conditionFn(Object.assign(
       {},
       { [fieldName]: entityState[fieldName] },
