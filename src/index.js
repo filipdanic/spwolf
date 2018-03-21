@@ -1,5 +1,5 @@
 module.exports = {
-  FormHoC: require('./SpForm.js').FormHoC,
+  FormHOC: require('./SpForm.js').FormHOC,
   connect: require('./SpForm.js').connect,
   calculateHash: require('./hash.js').calculateHash,
   getHash: require('./hash.js').getHash,

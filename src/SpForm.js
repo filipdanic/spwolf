@@ -16,7 +16,7 @@ import {
   canSubmitForm
 } from './validation';
 
-export const FormHoC = ({ componentMap, wrappers }) => {
+export const FormHOC = ({ componentMap, wrappers }) => {
   class SpWolfForm extends React.Component {
     constructor(props) {
       super(props);

@@ -21,11 +21,11 @@ Step by step, this is more less what you’d to get started:
 2. In some file `EntityForm.js` do the following:
 
 ```javascript
-import { FormHoC } from 'spwolf';
+import { FormHOC } from 'spwolf';
 import { TextInputField, CheckBoxField, SelectField, ComplexField } from '../my/form/input/elements';
 import { FormWrapper, FormSection } from '../my/form/presentational/elements';
 
-export default FormHoC({
+export default FormHOC({
   componentMap: {
     shortText: TextInputField,
     checkbox: CheckBoxField,
@@ -148,7 +148,7 @@ export default [{
 
 ```
 
-There’s a lot to unpack here and the best way to really understand it is to go through the example or to look at the PropTypes declaration of `FormHoC` in `src/SpForm.js`. 
+There’s a lot to unpack here and the best way to really understand it is to go through the example or to look at the PropTypes declaration of `FormHOC` in `src/SpForm.js`. 
 
 
 **Credits**
