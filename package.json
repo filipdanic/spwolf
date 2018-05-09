@@ -3,7 +3,7 @@
   "description": "Opinionated React.js Forms.",
   "author": "Filip Danić",
   "user": "filipdanic",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "scripts": {
     "start": "catalog start docs",
     "test": "jest",
