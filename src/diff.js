@@ -1,4 +1,4 @@
-import { diff, detailedDiff } from 'deep-object-diff';
+import deepObjectDiff from './deep-object-diff';
 
 /**
  * Returns an object with the keys `diff` and `detailedDiff`
@@ -10,6 +10,6 @@ import { diff, detailedDiff } from 'deep-object-diff';
  * @return {{diff: Object, detailedDiff: { added: Object, updated: Object, deleted: Object } }}
  */
 export default (initialState = {}, formState) => ({
-  diff: diff(initialState, formState),
-  detailedDiff: detailedDiff(initialState, formState)
+  diff: deepObjectDiff.diff(initialState, formState),
+  detailedDiff: deepObjectDiff.detailedDiff(initialState, formState)
 });
