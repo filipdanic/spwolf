@@ -3,7 +3,7 @@
   "description": "Opinionated React.js Forms.",
   "author": "Filip Danić",
   "user": "filipdanic",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "license": "MIT",
   "repository": "filipdanic/spwolf",
   "main": "dist/index.js",
