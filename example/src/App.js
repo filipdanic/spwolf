@@ -66,6 +66,7 @@ class ExampleApp extends Component {
             <Section pad='large' justify='center' align='center'>
               <Header>
                 <h1 className='App-title'><span role='img' aria-label='wolf emoji'>🐺</span> spwolf demo</h1>
+                <p>Tip: Open the console!</p>
               </Header>
               <div className='App-body'>
                 <Form

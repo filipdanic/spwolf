@@ -17,7 +17,7 @@ export default [{
 }, {
   name: 'userGroup',
   fieldType: 'select',
-  label: 'User Group',
+  label: 'User Group (Async)',
   options: undefined,
   asyncEval: [{
     key: 'options',

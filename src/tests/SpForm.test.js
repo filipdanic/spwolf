@@ -1,6 +1,6 @@
-import React from 'react';
-import renderer from 'react-test-renderer';
-import { FormHOC } from '../SpForm';
+import React from 'react'
+import renderer from 'react-test-renderer'
+import { FormHOC } from '../SpForm'
 
 const TextField = ({ label, value, onChange, required, name }) => (
   <label htmlFor={name}>
@@ -9,12 +9,12 @@ const TextField = ({ label, value, onChange, required, name }) => (
       name={name}
       id={name}
       required={required}
-      type="text"
+      type='text'
       value={value}
       onChange={onChange}
     />
   </label>
-);
+)
 
 const SectionWrap = ({ children, meta }) => (
   <div>
@@ -25,8 +25,8 @@ const SectionWrap = ({ children, meta }) => (
       {children}
     </div>
   </div>
-);
-const FormWrap = ({ children }) => <div>{children}</div>;
+)
+const FormWrap = ({ children }) => <div>{children}</div>
 const specs = {
   sections: [{
     elements: [{
@@ -54,7 +54,7 @@ const specs = {
     fn: state => !(state.bar) || state.bar.length > 20,
     dependsOn: ['bar']
   }]
-};
+}
 
 describe('SpWolf', () => {
   it('renders SpWolf component correctly after initializing via FormHOC', () => {
@@ -66,12 +66,12 @@ describe('SpWolf', () => {
         form: FormWrap,
         section: SectionWrap
       }
-    });
+    })
     const tree = renderer.create(<SpWolf
       initialState={{ foo: 'foofoo' }}
       specs={specs}
       onCanSubmitFormChange={val => console.log(val)}
-    />).toJSON();
-    expect(tree).toMatchSnapshot();
-  });
-});
+    />).toJSON()
+    expect(tree).toMatchSnapshot()
+  })
+})
