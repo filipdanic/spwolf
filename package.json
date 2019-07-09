@@ -87,6 +87,7 @@
     "test"
   ],
   "dependencies": {
+    "deepmerge": "^3.3.0",
     "fast-memoize": "^2.3.0",
     "prop-types": "^15.6.1"
   }

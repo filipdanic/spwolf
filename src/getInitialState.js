@@ -12,9 +12,12 @@
  *    canSubmitForm: boolean
  *  }}
  */
+
+import deepmerge from 'deepmerge';
+
 export default (props = {}) => ({
-  initialState: props.initialState || {},
-  entityState: props.initialState || {},
+  initialState: deepmerge({}, props.initialState || {}),
+  entityState: deepmerge({}, props.initialState || {}),
   cachedAsyncFields: {},
   validationFeedback: {},
   canSubmitForm: true
