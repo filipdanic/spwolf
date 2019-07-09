@@ -1,16 +1,9 @@
 {
   "presets": [
-    "es2015",
-    "react",
-    "stage-0"
-  ],
-  "plugins": [
-    "syntax-dynamic-import",
-    [
-      "transform-react-remove-prop-types",
-      {
-        "mode": "wrap"
-      }
-    ]
+    ["env", {
+      "modules": false
+    }],
+    "stage-0",
+    "react"
   ]
 }
