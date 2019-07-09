@@ -1,22 +1,11 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import { FormHOC, connect } from './SpForm'
+import { getHash, calculateHashOfValue as calculateHash } from './hash'
+import getDiff from './diff'
 
-import styles from './styles.css'
-
-export default class ExampleComponent extends Component {
-  static propTypes = {
-    text: PropTypes.string
-  }
-
-  render() {
-    const {
-      text
-    } = this.props
-
-    return (
-      <div className={styles.test}>
-        Example Component: {text}
-      </div>
-    )
-  }
+export {
+  FormHOC,
+  connect,
+  getHash,
+  calculateHash,
+  getDiff
 }

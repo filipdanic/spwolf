@@ -1,8 +1,9 @@
 {
   "name": "spwolf",
-  "version": "1.0.0",
-  "description": "",
-  "author": "filipdanic",
+  "description": "Opinionated React.js Forms.",
+  "author": "Filip Danić",
+  "user": "filipdanic",
+  "version": "0.0.15",
   "license": "MIT",
   "repository": "filipdanic/spwolf",
   "main": "dist/index.js",
@@ -57,5 +58,9 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "deep-object-diff": "^1.1.0",
+    "deepmerge": "^4.0.0"
+  }
 }
